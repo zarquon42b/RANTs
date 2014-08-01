@@ -38,8 +38,12 @@ newAntsExample <- function(reference, target, setting=c("fast","production"),itk
 #' @param affine path to affine transformation
 #' @param warp path to warp
 #' @importFrom Morpho vert2points
+#' @rdname antsTransformPoints
 #' @export
 antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/")UseMethod("antsTransformPoints")
+
+#' @rdname antsTransformPoints
+#' @export
 antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/") {
     pts <- mat%*% diag(c(-1,-1,1))
     write.csv(pts,file="pts.csv",row.names=F)
@@ -49,6 +53,9 @@ antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
     readit <- as.matrix(read.csv("ptsDeformed2.csv")[,1:3])%*%diag(c(-1,-1,1))##convert back to RAS space
     return(readit)
 }
+
+#' @rdname antsTransformPoints
+#' @export
 antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/") {
     mesh <- mat
     mat <- vert2points(mat)
