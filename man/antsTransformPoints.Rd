@@ -2,11 +2,15 @@
 \name{antsTransformPoints}
 \alias{antsTransformPoints}
 \alias{antsTransformPoints.matrix}
+\alias{antsTransformPoints.mesh3d}
 \title{calls antsApplyTransformsToPoints}
 \usage{
 antsTransformPoints(mat, affine, warp, antsdir = "~/GIT/DEV/ANTSbuild/bin/")
 
 \method{antsTransformPoints}{matrix}(mat, affine, warp,
+  antsdir = "~/GIT/DEV/ANTSbuild/bin/")
+
+\method{antsTransformPoints}{mesh3d}(mat, affine, warp,
   antsdir = "~/GIT/DEV/ANTSbuild/bin/")
 }
 \arguments{
