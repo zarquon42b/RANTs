@@ -72,6 +72,8 @@ antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
     mesh$vb[1:3,] <- t(readit)
 return(mesh)
 }
+
+
 #' interface to generate arguments for antsRegistration command
 #'
 #' interface to generate arguments for antsRegistration command
@@ -80,6 +82,8 @@ return(mesh)
 #' @param target path to fixed image
 #' @param setting name of the setting to be attached to output
 #' @param percent parameter for ants
+#' @param searchradius searchradius for CC metric
+#' @param mattesbins binsize for Mattes MI metric
 #' @param its parameters for non-syn registration
 #' @param synargs parameters for syn registration
 #' @param itkthreads integer: specify number of threads to be used
@@ -88,25 +92,38 @@ return(mesh)
 #' @param affine run affine matching
 #' @param syn run syn matching
 #' @export
-createAntsArgs <- function(reference,target,setting="custom",percent=0.1,its="10000x10000x10000",synargs ="[100x10x1,0,5]",cc=FALSE,itkthreads=4,trans=T,rigid=T,affine=T,syn=T) {
+createAntsArgs <- function(reference,target,setting="custom",percent=0.1,searchradius=4,mattesbins=32,its="10000x10000x10000",synargs ="[100x10x1,0,5]",cc=FALSE,itkthreads=4,trans=T,rigid=T,affine=T,gauss=F,expo=F,syn=T) {
     Sys.setenv(ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=itkthreads)
     nm=paste0(target,"_fixed_",reference,"_moving_",setting[1])
      antsargs <- list(d=3)
     if (trans)
-              antsargs <- append(antsargs,list(m=paste0("mattes[",target,",",reference,",1,32,regular,",percent,"]"), t="translation[0.1]", c=paste0("[",its,",1e-8,20]"), s="4x2x1vox", f="6x4x2",l="1"))
+              antsargs <- append(antsargs,list(m=paste0("mattes[",target,",",reference,",1,",mattesbins,",regular,",percent,"]"), t="translation[0.1]", c=paste0("[",its,",1e-8,20]"), s="4x2x1vox", f="6x4x2",l="1"))
                                  ## translation step
     if (rigid)
         antsargs <- append(antsargs,list(
-                     m=paste0("mattes[",target,",",reference,",1,32,regular,",percent,"]"), t="rigid[0.1]",c=paste0("[",its,",1e-8,20]"), s="4x2x1vox", f="3x2x1"))
+                     m=paste0("mattes[",target,",",reference,",1,",mattesbins,",regular,",percent,"]"), t="rigid[0.1]",c=paste0("[",its,",1e-8,20]"), s="4x2x1vox", f="3x2x1"))
     ##rigid alignment
     if (affine)
            antsargs <- append(antsargs,list(                 
-               m=paste0("mattes[",target,",",reference,",1,32,regular,",percent,"]"), t="affine[0.1]",c=paste0("[",its,",1e-8,20]"), s="4x2x1vox",  f="3x2x1"))
+               m=paste0("mattes[",target,",",reference,",1,",mattesbins,",regular,",percent,"]"), t="affine[0.1]",c=paste0("[",its,",1e-8,20]"), s="4x2x1vox",  f="3x2x1"))
+    
+    if (gauss)
+        antsargs <- append(antsargs,list(         
+                     m=paste0("mattes[",target,",",reference,",0.5,", mattesbins,"]"),m=paste0("cc[",target,",",reference,",0.5,", searchradius, "]"),t="GaussianDisplacementField[0.2,3,0]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
+
     if (syn)
         antsargs <- append(antsargs,list(         
-                     m=paste0("mattes[",target,",",reference,",0.5,32]"),m=paste0("cc[",target,",",reference,",0.5,4]"),t="SyN[0.2,3,0]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
+            m=paste0("mattes[",target,",",reference,",0.5,",mattesbins,"]"),m=paste0("cc[",target,",",reference,",0.5,", searchradius, "]"),t="SyN[0.2,3,0]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
+
+    if (expo)
+        antsargs <- append(antsargs,list(         
+            m=paste0("mattes[",target,",",reference,",0.5,32]"),m=paste0("cc[",target,",",reference,",0.5,4]"),t="Exponential[0.2,3,0.5,10]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
+
+
     antsargs <- append(antsargs,list(u="1",l="1",z="1",float="0",
                                      o=paste0("[",nm,",",nm,"_diff.nii.gz,",nm,"_inv.nii.gz]")))
+    
+        
      return(antsargs)
 }
 
