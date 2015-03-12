@@ -48,7 +48,12 @@ antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin
 antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/") {
     pts <- mat%*% diag(c(-1,-1,1))
     write.csv(pts,file="pts.csv",row.names=F)
-    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d 3 -i pts.csv -o ptsDeformed2.csv -t ",affine," -t ",warp)
+    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d 3 -i pts.csv -o ptsDeformed2.csv")
+    if (!missing(affine))
+        cmd <- paste0(cmd," -t ",affine)
+
+    if (!is.null(warp))
+        cmd <- paste0(cmd," -t ",warp)
     print(cmd)
     system(cmd)
     readit <- as.matrix(read.csv("ptsDeformed2.csv")[,1:3])%*%diag(c(-1,-1,1))##convert back to RAS space
@@ -64,8 +69,12 @@ antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
     ptsname <- paste0(tempdir(),"/pts.csv")
     write.csv(pts,file=ptsname,row.names=F)
     output <- paste0(tempdir(),"/ptsDeformed2.csv")
-    
-    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d 3 -i ",ptsname," -o ",output," -t ",affine," -t ",warp)
+    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d 3 -i ",ptsname," -o ",output)
+    if (!is.null(affine))
+        cmd <- paste0(cmd," -t ",affine)
+
+    if (!is.null(warp))
+        cmd <- paste0(cmd," -t ",warp)
     print(cmd)
     system(cmd)
     readit <- as.matrix(read.csv(output)[,1:3])%*%diag(c(-1,-1,1))##convert back to RAS space
@@ -92,13 +101,19 @@ return(mesh)
 #' @param affine run affine matching
 #' @param syn run syn matching
 #' @export
-createAntsArgs <- function(reference,target,setting="custom",percent=0.1,searchradius=4,mattesbins=32,its="10000x10000x10000",synargs ="[100x10x1,0,5]",cc=FALSE,itkthreads=4,trans=T,rigid=T,affine=T,gauss=F,expo=F,syn=T) {
+createAntsArgs <- function(reference,target,setting="custom",percent=0.1,synpercent=0.1,searchradius=4,mattesbins=32,its="10000x10000x10000",synargs ="[100x10x1,0,5]",cc=FALSE,itkthreads=4,trans=T,rigid=T,similarity=T,affine=T,BSplineDisp=F,gauss=F,expo=F,syn=T,mattesweight=0.5,ccweight=0.5,dims=3,initTransform=NULL,PSE=NULL) {
     Sys.setenv(ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=itkthreads)
     nm=paste0(target,"_fixed_",reference,"_moving_",setting[1])
-     antsargs <- list(d=3)
+     antsargs <- list(d=dims)
+    if (!is.null(initTransform))
+        antsargs <- append(antsargs,list(r=paste0("[",target,",",reference,",",initTransform,"]")))
     if (trans)
-              antsargs <- append(antsargs,list(m=paste0("mattes[",target,",",reference,",1,",mattesbins,",regular,",percent,"]"), t="translation[0.1]", c=paste0("[",its,",1e-8,20]"), s="4x2x1vox", f="6x4x2",l="1"))
+        antsargs <- append(antsargs,list(m=paste0("mattes[",target,",",reference,",1,",mattesbins,",regular,",percent,"]"), t="translation[0.1]", c=paste0("[",its,",1e-8,20]"), s="4x2x1vox", f="6x4x2",l="1"))
                                  ## translation step
+    if (similarity)
+        antsargs <- append(antsargs,list(
+                     m=paste0("mattes[",target,",",reference,",1,",mattesbins,",regular,",percent,"]"), t="similarity[0.1]",c=paste0("[",its,",1e-8,20]"), s="4x2x1vox", f="3x2x1"))
+    ##rigid alignment
     if (rigid)
         antsargs <- append(antsargs,list(
                      m=paste0("mattes[",target,",",reference,",1,",mattesbins,",regular,",percent,"]"), t="rigid[0.1]",c=paste0("[",its,",1e-8,20]"), s="4x2x1vox", f="3x2x1"))
@@ -109,23 +124,26 @@ createAntsArgs <- function(reference,target,setting="custom",percent=0.1,searchr
     
     if (gauss)
         antsargs <- append(antsargs,list(         
-                     m=paste0("mattes[",target,",",reference,",0.5,", mattesbins,"]"),m=paste0("cc[",target,",",reference,",0.5,", searchradius, "]"),t="GaussianDisplacementField[0.2,3,0]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
+                     m=paste0("mattes[",target,",",reference,",0.5,", mattesbins,",regular,",synpercent,"]"),m=paste0("cc[",target,",",reference,",0.5,", searchradius, "]"),t="GaussianDisplacementField[0.2,3,0]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
 
     if (syn)
         antsargs <- append(antsargs,list(         
-            m=paste0("mattes[",target,",",reference,",0.5,",mattesbins,"]"),m=paste0("cc[",target,",",reference,",0.5,", searchradius, "]"),t="SyN[0.2,3,0]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
+            m=paste0("mattes[",target,",",reference,",",mattesweight,",",mattesbins,",regular,",synpercent,"]"),m=paste0("cc[",target,",",reference,",",ccweight ,",", searchradius, "]"),t="SyN[0.2,3,0]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
 
     if (expo)
         antsargs <- append(antsargs,list(         
             m=paste0("mattes[",target,",",reference,",0.5,32]"),m=paste0("cc[",target,",",reference,",0.5,4]"),t="Exponential[0.2,3,0.5,10]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
-
-
+    if (BSplineDisp)
+        antsargs <- append(antsargs,list(         
+            m=paste0("mattes[",target,",",reference,",0.5,32]"),m=paste0("cc[",target,",",reference,",0.5,4]"),t="BSplineDisplacementField[0.2,3,0.5,3]", c=synargs,  s="1x0.5x0vox", f="4x2x1"))
+    
     antsargs <- append(antsargs,list(u="1",l="1",z="1",float="0",
                                      o=paste0("[",nm,",",nm,"_diff.nii.gz,",nm,"_inv.nii.gz]")))
     
         
      return(antsargs)
 }
+
 
 
 
