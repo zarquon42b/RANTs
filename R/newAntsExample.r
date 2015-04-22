@@ -48,36 +48,18 @@ antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin
 #' @export
 antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",...) {
     ptsdim <- ncol(mat)
-    if (ptsdim == 3)
+    if (ptsdim == 3) {
         pts <- mat%*% diag(c(-1,-1,1))
-    else if (ptsdim == 2)
-        pts <- mat
-    else
+        pts <- cbind(pts,0)
+    } else if (ptsdim == 2) {
+          pts <- mat
+          pts <- cbind(pts,0)
+          pts <- pts%*% diag(c(-1,-1,1))
+          pts <- cbind(pts,0)
+      } else
         stop("only 2D and 3D points allowed")
-        
-        
-    write.csv(pts,file="pts.csv",row.names=F)
-    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d ",ptsdim," -i pts.csv -o ptsDeformed2.csv")
-    if (!missing(affine))
-        cmd <- paste0(cmd," -t ",affine)
-
-    if (!missing(warp))
-        cmd <- paste0(cmd," -t ",warp)
-    system(cmd)
-    
-        readit <- as.matrix(read.csv("ptsDeformed2.csv")[,1:3])
-    if (ptsdim == 3)
-        readit <- readit%*%diag(c(-1,-1,1))##convert back to RAS space
-    
-    return(readit)
-}
-
-#' @rdname antsTransformPoints
-#' @export
-antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",...) {
-    mesh <- mat
-    mat <- vert2points(mat)
-    pts <- mat%*% diag(c(-1,-1,1))
+    print(dim(pts))
+    colnames(pts) <- c("x","y","z","t")
     ptsname <- paste0(tempdir(),"/pts.csv")
     write.csv(pts,file=ptsname,row.names=F)
     output <- paste0(tempdir(),"/ptsDeformed2.csv")
@@ -89,7 +71,20 @@ antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
         cmd <- paste0(cmd," -t ",warp)
     print(cmd)
     system(cmd)
-    readit <- as.matrix(read.csv(output)[,1:3])%*%diag(c(-1,-1,1))##convert back to RAS space
+    
+    readit <- as.matrix(read.csv(output)[,1:3])%*%diag(c(-1,-1,1))
+    if (ptsdim == 3)
+    readit <- readit[,1:ptsdim]##convert back to RAS space
+    
+    return(readit)
+}
+
+#' @rdname antsTransformPoints
+#' @export
+antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",...) {
+    mesh <- mat
+    mat <- vert2points(mat)
+    readit <- antsTransformPoints(mat,affine=affine,warp=warp,antsdir=antsdir,...)
     mesh$vb[1:3,] <- t(readit)
 return(mesh)
 }
