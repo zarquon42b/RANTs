@@ -40,6 +40,7 @@ newAntsExample <- function(reference, target, setting=c("fast","production"),itk
 #' @param warp path to warp
 #' @param antsdir path to directory containing antsApplyTransformsToPoints
 #' @importFrom Morpho vert2points
+#' @importFrom Rvcg vcgUpdateNormals
 #' @rdname antsTransformPoints
 #' @export
 antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",...)UseMethod("antsTransformPoints")
@@ -85,6 +86,7 @@ antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
     mat <- vert2points(mat)
     readit <- antsTransformPoints(mat,affine=affine,warp=warp,antsdir=antsdir,...)
     mesh$vb[1:3,] <- t(readit)
+    mesh <- vcgUpdateNormals(mesh)
 return(mesh)
 }
 
