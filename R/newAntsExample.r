@@ -69,12 +69,11 @@ antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
 
     if (!missing(warp))
         cmd <- paste0(cmd," -t ",warp)
-    #print(cmd)
+    print(cmd)
     system(cmd)
     
-    readit <- as.matrix(read.csv(output)[,1:3])%*%diag(c(-1,-1,1))
-    if (ptsdim == 3)
-    readit <- readit[,1:ptsdim]##convert back to RAS space
+    readit <- as.matrix(read.csv(output)[,1:3])%*%diag(c(-1,-1,1))##convert back to RAS space
+    readit <- readit[,1:ptsdim]
     
     return(readit)
 }
