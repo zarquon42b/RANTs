@@ -38,17 +38,26 @@ newAntsExample <- function(reference, target, setting=c("fast","production"),itk
 #' @param mat a matrix or mesh3d
 #' @param affine path to affine transformation
 #' @param warp path to warp
+#' @param antsdir path to directory containing antsApplyTransformsToPoints
 #' @importFrom Morpho vert2points
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/")UseMethod("antsTransformPoints")
+antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",...)UseMethod("antsTransformPoints")
 
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/") {
-    pts <- mat%*% diag(c(-1,-1,1))
+antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",...) {
+    ptsdim <- ncol(mat)
+    if (ptsdim == 3)
+        pts <- mat%*% diag(c(-1,-1,1))
+    else if (ptsdim == 2)
+        pts <- mat
+    else
+        stop("only 2D and 3D points allowed")
+        
+        
     write.csv(pts,file="pts.csv",row.names=F)
-    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d 3 -i pts.csv -o ptsDeformed2.csv")
+    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d ",ptsdim," -i pts.csv -o ptsDeformed2.csv")
     if (!missing(affine))
         cmd <- paste0(cmd," -t ",affine)
 
@@ -62,7 +71,7 @@ antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
 
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/") {
+antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",...) {
     mesh <- mat
     mat <- vert2points(mat)
     pts <- mat%*% diag(c(-1,-1,1))
