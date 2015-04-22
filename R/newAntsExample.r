@@ -109,8 +109,20 @@ return(mesh)
 #' @param rigid run rigid matching
 #' @param affine run affine matching
 #' @param syn run syn matching
+#' @param BSplineDisp use B-Spline deformations
+#' @param gauss use gaussian Smoothed deformation fields
+#' @param expo use Exponential deformation type
+#' @param mattesweight weight to attribute to mattes metric
+#' @param ccweight weight to attribute to CC metric
+#' @param dims dimensionality of data
+#' @param initTransform run initial coarse alignment. These features include using the geometric center of the
+#' images (=0), the image intensities (=1), or the origin of the images (=2).
+#' @param PSE not supported yet
+#' @return returns a list with
+#' \item{antsargs}{arguments passed to antsRegistration}
+#' \item{outname}{basename of outputname}
 #' @export
-createAntsArgs <- function(reference,target,setting="custom",percent=0.1,synpercent=0.1,searchradius=4,mattesbins=32,its="10000x10000x10000",synargs ="[100x10x1,0,5]",cc=FALSE,itkthreads=4,trans=T,rigid=T,similarity=T,affine=T,BSplineDisp=F,gauss=F,expo=F,syn=T,mattesweight=0.5,ccweight=0.5,dims=3,initTransform=NULL,PSE=NULL) {
+createAntsArgs <- function(reference,target,setting="custom",percent=0.1,synpercent=0.1,searchradius=4,mattesbins=32,its="10000x10000x10000",synargs ="[100x10x1,0,5]",cc=FALSE,itkthreads=parallel::detectCores(),trans=T,rigid=T,similarity=T,affine=T,BSplineDisp=F,gauss=F,expo=F,syn=T,mattesweight=0.5,ccweight=0.5,dims=3,initTransform=NULL,PSE=NULL) {
     Sys.setenv(ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=itkthreads)
     nm=paste0(target,"_fixed_",reference,"_moving_",setting[1])
      antsargs <- list(d=dims)
@@ -150,7 +162,7 @@ createAntsArgs <- function(reference,target,setting="custom",percent=0.1,synperc
                                      o=paste0("[",nm,",",nm,"_diff.nii.gz,",nm,"_inv.nii.gz]")))
     
         
-     return(antsargs)
+     return(list(antsargs=antsargs,outname=basename(nm)))
 }
 
 
