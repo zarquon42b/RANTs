@@ -61,11 +61,14 @@ antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
     if (!missing(affine))
         cmd <- paste0(cmd," -t ",affine)
 
-    if (!is.null(warp))
+    if (!missing(warp))
         cmd <- paste0(cmd," -t ",warp)
-    print(cmd)
     system(cmd)
-    readit <- as.matrix(read.csv("ptsDeformed2.csv")[,1:3])%*%diag(c(-1,-1,1))##convert back to RAS space
+    
+        readit <- as.matrix(read.csv("ptsDeformed2.csv")[,1:3])
+    if (ptsdim == 3)
+        readit <- readit%*%diag(c(-1,-1,1))##convert back to RAS space
+    
     return(readit)
 }
 
@@ -82,7 +85,7 @@ antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
     if (!is.null(affine))
         cmd <- paste0(cmd," -t ",affine)
 
-    if (!is.null(warp))
+    if (!missing(warp))
         cmd <- paste0(cmd," -t ",warp)
     print(cmd)
     system(cmd)
