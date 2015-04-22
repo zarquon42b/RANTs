@@ -58,18 +58,17 @@ antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
           pts <- cbind(pts,0)
       } else
         stop("only 2D and 3D points allowed")
-    print(dim(pts))
     colnames(pts) <- c("x","y","z","t")
     ptsname <- paste0(tempdir(),"/pts.csv")
     write.csv(pts,file=ptsname,row.names=F)
     output <- paste0(tempdir(),"/ptsDeformed2.csv")
-    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d 3 -i ",ptsname," -o ",output)
+    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d " ,ptsdim," -i ",ptsname," -o ",output)
     if (!is.null(affine))
         cmd <- paste0(cmd," -t ",affine)
 
     if (!missing(warp))
         cmd <- paste0(cmd," -t ",warp)
-    print(cmd)
+    #print(cmd)
     system(cmd)
     
     readit <- as.matrix(read.csv(output)[,1:3])%*%diag(c(-1,-1,1))
