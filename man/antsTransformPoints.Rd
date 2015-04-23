@@ -7,13 +7,15 @@
 \title{calls antsApplyTransformsToPoints}
 \usage{
 antsTransformPoints(mat, affine, warp, antsdir = "~/GIT/DEV/ANTSbuild/bin/",
-  IJK2RAS = diag(c(-1, -1, 1)), ...)
+  IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
 
 \method{antsTransformPoints}{matrix}(mat, affine, warp,
-  antsdir = "~/GIT/DEV/ANTSbuild/bin/", IJK2RAS = diag(c(-1, -1, 1)), ...)
+  antsdir = "~/GIT/DEV/ANTSbuild/bin/", IJK2RAS = diag(c(-1, -1, 1, 1)),
+  ...)
 
 \method{antsTransformPoints}{mesh3d}(mat, affine, warp,
-  antsdir = "~/GIT/DEV/ANTSbuild/bin/", IJK2RAS = diag(c(-1, -1, 1)), ...)
+  antsdir = "~/GIT/DEV/ANTSbuild/bin/", IJK2RAS = diag(c(-1, -1, 1, 1)),
+  ...)
 }
 \arguments{
 \item{mat}{a matrix or mesh3d}
@@ -24,7 +26,7 @@ antsTransformPoints(mat, affine, warp, antsdir = "~/GIT/DEV/ANTSbuild/bin/",
 
 \item{antsdir}{path to directory containing antsApplyTransformsToPoints}
 
-\item{IJK2RAS}{3x3 matrix containing the transform between image and pointspace}
+\item{IJK2RAS}{4x4 matrix containing the transform between image and pointspace. For 2D pointclouds this must be the transformation for cbind(mat,0) - the z-coordinate supplemented with zeros.}
 }
 \description{
 calls antsApplyTransformsToPoints

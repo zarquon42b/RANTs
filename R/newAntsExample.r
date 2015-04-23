@@ -39,24 +39,24 @@ newAntsExample <- function(reference, target, setting=c("fast","production"),itk
 #' @param affine path to affine transformation
 #' @param warp path to warp
 #' @param antsdir path to directory containing antsApplyTransformsToPoints
-#' @param IJK2RAS 3x3 matrix containing the transform between image and pointspace
-#' @importFrom Morpho vert2points
+#' @param IJK2RAS 4x4 matrix containing the transform between image and pointspace. For 2D pointclouds this must be the transformation for cbind(mat,0) - the z-coordinate supplemented with zeros.
+#' @importFrom Morpho vert2points applyTransform
 #' @importFrom Rvcg vcgUpdateNormals
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1)),...)UseMethod("antsTransformPoints")
+antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1,1)),...)UseMethod("antsTransformPoints")
 
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1)),...) {
+antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1,1)),...) {
     ptsdim <- ncol(mat)
     if (ptsdim == 3) {
-        pts <- mat%*%IJK2RAS
+        pts <- applyTransform(mat,IJK2RAS)
         pts <- cbind(pts,0)
     } else if (ptsdim == 2) {
           pts <- mat
           pts <- cbind(pts,0)
-          pts <- pts%*% IJK2RAS
+          pts <- applyTransform(pts,IJK2RAS)
           pts <- cbind(pts,0)
       } else
         stop("only 2D and 3D points allowed")
@@ -73,7 +73,7 @@ antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
     print(cmd)
     system(cmd)
     
-    readit <- as.matrix(read.csv(output)[,1:3])%*%solve(IJK2RAS)##convert back to RAS space
+    readit <- applyTransform(as.matrix(read.csv(output)[,1:3]),trafo=IJK2RAS,inverse=T)##convert back to RAS space
     readit <- readit[,1:ptsdim]
     
     return(readit)
@@ -81,7 +81,7 @@ antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
 
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1)),...) {
+antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1,1)),...) {
     mesh <- mat
     mat <- vert2points(mat)
     readit <- antsTransformPoints(mat,affine=affine,warp=warp,antsdir=antsdir,...)
