@@ -44,36 +44,24 @@ newAntsExample <- function(reference, target, setting=c("fast","production"),itk
 #' @importFrom Rvcg vcgUpdateNormals
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1,1)),...)UseMethod("antsTransformPoints")
+antsTransformPoints <- function(mat,transformlist,IJK2RAS=diag(c(-1,-1,1,1)),...)UseMethod("antsTransformPoints")
 
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1,1)),...) {
+antsTransformPoints.matrix <- function(mat,transformlist, whichtoinvert=NA,IJK2RAS=diag(c(-1,-1,1,1)),...) {
     ptsdim <- ncol(mat)
     if (ptsdim == 3) {
         pts <- applyTransform(mat,IJK2RAS)
-        pts <- cbind(pts,0)
     } else if (ptsdim == 2) {
-          pts <- mat
-          pts <- cbind(pts,0)
-          pts <- applyTransform(pts,IJK2RAS)
-          pts <- cbind(pts,0)
-      } else
+        pts <- mat
+        pts <- cbind(pts,0)
+        pts <- applyTransform(pts,IJK2RAS)
+    } else
         stop("only 2D and 3D points allowed")
-    colnames(pts) <- c("x","y","z","t")
-    ptsname <- paste0(tempdir(),"/pts.csv")
-    write.csv(pts,file=ptsname,row.names=F)
-    output <- paste0(tempdir(),"/ptsDeformed2.csv")
-    cmd <- paste0(antsdir,"antsApplyTransformsToPoints -d " ,ptsdim," -i ",ptsname," -o ",output)
-    if (!missing(affine))
-        cmd <- paste0(cmd," -t ",affine)
-
-    if (!missing(warp))
-        cmd <- paste0(cmd," -t ",warp)
-    print(cmd)
-    system(cmd)
-    
-    readit <- applyTransform(as.matrix(read.csv(output)[,1:3]),trafo=IJK2RAS,inverse=T)##convert back to RAS space
+    #readit <- as.matrix(antsApplyTransformsToPoints(ptsdim,pts,transformlist,whichtoinvert))
+    print(dim(pts))
+    readit <- applyTransform(as.matrix(antsApplyTransformsToPoints(ptsdim,pts,transformlist,whichtoinvert)),trafo=IJK2RAS,inverse=T)
+    #readit <- applyTransform(as.matrix(read.csv(output)[,1:3]),trafo=IJK2RAS,inverse=T)##convert back to RAS space
     readit <- readit[,1:ptsdim]
     
     return(readit)
@@ -81,10 +69,10 @@ antsTransformPoints.matrix <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbu
 
 #' @rdname antsTransformPoints
 #' @export
-antsTransformPoints.mesh3d <- function(mat,affine,warp,antsdir="~/GIT/DEV/ANTSbuild/bin/",IJK2RAS=diag(c(-1,-1,1,1)),...) {
+antsTransformPoints.mesh3d <- function(mat,transformlist, whichtoinvert=NA,IJK2RAS=diag(c(-1,-1,1,1)),...) {
     mesh <- mat
     mat <- vert2points(mat)
-    readit <- antsTransformPoints(mat,affine=affine,warp=warp,antsdir=antsdir,...)
+    readit <- antsTransformPoints(mat,transformlist,whichtoinvert,IJK2RAS,...)
     mesh$vb[1:3,] <- t(readit)
     mesh <- vcgUpdateNormals(mesh)
 return(mesh)
