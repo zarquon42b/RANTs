@@ -6,27 +6,24 @@
 \alias{antsTransformPoints.mesh3d}
 \title{calls antsApplyTransformsToPoints}
 \usage{
-antsTransformPoints(mat, affine, warp, antsdir = "~/GIT/DEV/ANTSbuild/bin/",
+antsTransformPoints(mat, transformlist, IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
+
+\method{antsTransformPoints}{matrix}(mat, transformlist, whichtoinvert = NA,
   IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
 
-\method{antsTransformPoints}{matrix}(mat, affine, warp,
-  antsdir = "~/GIT/DEV/ANTSbuild/bin/", IJK2RAS = diag(c(-1, -1, 1, 1)),
-  ...)
-
-\method{antsTransformPoints}{mesh3d}(mat, affine, warp,
-  antsdir = "~/GIT/DEV/ANTSbuild/bin/", IJK2RAS = diag(c(-1, -1, 1, 1)),
-  ...)
+\method{antsTransformPoints}{mesh3d}(mat, transformlist, whichtoinvert = NA,
+  IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
 }
 \arguments{
 \item{mat}{a matrix or mesh3d}
+
+\item{IJK2RAS}{4x4 matrix containing the transform between image and pointspace. For 2D pointclouds this must be the transformation for cbind(mat,0) - the z-coordinate supplemented with zeros.}
 
 \item{affine}{path to affine transformation}
 
 \item{warp}{path to warp}
 
 \item{antsdir}{path to directory containing antsApplyTransformsToPoints}
-
-\item{IJK2RAS}{4x4 matrix containing the transform between image and pointspace. For 2D pointclouds this must be the transformation for cbind(mat,0) - the z-coordinate supplemented with zeros.}
 }
 \description{
 calls antsApplyTransformsToPoints

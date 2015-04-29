@@ -6,11 +6,12 @@
 \usage{
 createAntsArgs(reference, target, setting = "custom", percent = 0.1,
   synpercent = 0.1, searchradius = 4, mattesbins = 32,
-  its = "10000x10000x10000", synargs = "[100x10x1,0,5]", cc = FALSE,
-  itkthreads = parallel::detectCores(), trans = T, rigid = T,
-  similarity = T, affine = T, BSplineDisp = F, gauss = F, expo = F,
-  syn = T, mattesweight = 0.5, ccweight = 0.5, dims = 3,
-  initTransform = NULL, PSE = NULL)
+  its = "10000x10000x10000", synargs = "[100x10x1,0,5]",
+  affine = c("trans", "rigid", "similarity", "affine"),
+  elastic = "SyN[0.2,3,0]", elasticmetrics = c("mattes", "cc"),
+  metricweights = c(0.5, 0.5), metricreach = c(32, 4), dims = 3,
+  initTransform = NULL, elasticS = "3x1x0vox", elasticF = "3x2x1",
+  itkthreads = parallel::detectCores())
 }
 \arguments{
 \item{reference}{path to moving image}
@@ -27,34 +28,28 @@ createAntsArgs(reference, target, setting = "custom", percent = 0.1,
 
 \item{its}{parameters for non-syn registration}
 
-\item{synargs}{parameters for syn registration}
+\item{synargs}{character: convergence valzes MxNxO [MxNxO,<convergenceThreshold=1e-6>,<convergenceWindowSize=10>]}
 
-\item{itkthreads}{integer: specify number of threads to be used}
+\item{affine}{character vector of non-elastic transform to use}
 
-\item{trans}{run translation}
+\item{elastic}{character vector of elastic procedures (including parameters). E.g "SyN[0.2,3,0]"}
 
-\item{rigid}{run rigid matching}
+\item{elasticmetrics}{character vector containing the metrics to be used in elastic matching}
 
-\item{affine}{run affine matching}
+\item{metricweights}{character vector of same length as \code{elasticmetrics}, assigning weights to each metric.}
 
-\item{BSplineDisp}{use B-Spline deformations}
-
-\item{gauss}{use gaussian Smoothed deformation fields}
-
-\item{expo}{use Exponential deformation type}
-
-\item{syn}{run syn matching}
-
-\item{mattesweight}{weight to attribute to mattes metric}
-
-\item{ccweight}{weight to attribute to CC metric}
+\item{metricreach}{character vector of same length as \code{elasticmetrics}, assigning the radius/bins for each metric to consider.}
 
 \item{dims}{dimensionality of data}
 
 \item{initTransform}{run initial coarse alignment. These features include using the geometric center of the
 images (=0), the image intensities (=1), or the origin of the images (=2).}
 
-\item{PSE}{not supported yet}
+\item{elasticS}{smoothing sigmas (see command args of antsRegistration)}
+
+\item{elasticF}{shrink factors (see command args of antsRegistration)}
+
+\item{itkthreads}{integer: specify number of threads to be used}
 }
 \value{
 returns a list with
