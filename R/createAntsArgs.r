@@ -24,6 +24,7 @@
 #' @return returns a list with
 #' \item{antsargs}{arguments passed to antsRegistration}
 #' \item{outname}{basename of outputname}
+#' \item{transforms}{list containing characters naming the transforms}
 #' @export
 createAntsArgs <- function(reference,target,setting="custom",percent=0.1,synpercent=0.1,searchradius=4,mattesbins=32,its="10000x10000x10000",synargs ="[100x10x1,0,5]", affine=c("trans","rigid","similarity","affine"),elastic="SyN[0.2,3,0]",elasticmetrics=c("mattes","cc"),metricweights=NULL, metricreach=c(32,4),dims=3,initTransform=NULL,elasticS="3x1x0vox",elasticF="3x2x1",itkthreads=parallel::detectCores()) {
     if (nargs() == 0) {
@@ -69,8 +70,13 @@ createAntsArgs <- function(reference,target,setting="custom",percent=0.1,synperc
     }    
     antsargs <- append(antsargs,list(u="1",l="1",z="1",float="1",
                                      o=paste0("[",nm,",",nm,"_diff.nii.gz,",nm,"_inv.nii.gz]")))
+
+    transforms <- list()
+    transforms$warpfwd <- paste0(nm,"1Warp.nii.gz")
+    transforms$warpinv <- paste0(nm,"1InverseWarp.nii.gz")
+    transforms$affine <-  paste0(nm,"0GenericAffine.mat")
+    return(list(antsargs=antsargs,outname=basename(nm),transforms=transforms))
     
-    return(list(antsargs=antsargs,outname=basename(nm)))
 }
 
 
