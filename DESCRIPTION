@@ -1,8 +1,8 @@
 Package: RANTs
 Type: Package
 Title: Playing with ANTs(R)
-Version: 0.1.150422
-Date: 2015-04-22
+Version: 0.1.150429
+Date: 2015-04-29
 Author: Stefan Schlager
 Maintainer: Stefan Schlager <stefan.schlager@uniklinik-freiburg.de>
 Description: Playing with ANTs(R)
