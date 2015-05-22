@@ -2,10 +2,12 @@
 
 S3method(antsTransformPoints,matrix)
 S3method(antsTransformPoints,mesh3d)
+export(antsImage2sitk)
 export(antsTransformPoints)
 export(createAntsArgs)
 export(getAffineMat)
 export(newAntsExample)
+export(sitk2antsImage)
 importFrom(Morpho,applyTransform)
 importFrom(Morpho,vert2points)
 importFrom(R.matlab,readMat)
