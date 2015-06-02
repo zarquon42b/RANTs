@@ -7,6 +7,7 @@
 #' @importFrom R.matlab readMat
 #' @export
 getAffineMat <- function(file,IJK2RAS=diag(c(-1,-1,1,1))) {
+    m <- 3
     aff <- readMat(file)
     affine <- t(matrix(aff$AffineTransform.float.3.3[1:9],3,3,byrow = T))
     trans <- aff$AffineTransform.float.3.3[10:12]
@@ -18,4 +19,13 @@ getAffineMat <- function(file,IJK2RAS=diag(c(-1,-1,1,1))) {
     htrans2[1:m, m + 1] <- c(trans)
     hall <- solve(IJK2RAS)%*%htrans2%*%solve(htrans)%*%t(hgamm) %*%htrans%*%IJK2RAS
     return(hall)
+}
+
+getAffineParams <- function(file) {
+    aff <- readMat(file)
+    out <- list()
+    out$translation <- aff$AffineTransform.float.3.3[10:12]
+    out$center <- aff$fixed
+    out$affine <- t(matrix(aff$AffineTransform.float.3.3[1:9],3,3,byrow = T))
+    return(out)
 }
