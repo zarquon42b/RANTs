@@ -82,8 +82,12 @@ createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine
 
     transforms <- list()
     if (length(elastic)) {
-        transforms$warpfwd <- paste0(nm,"1Warp.nii.gz")
-        transforms$warpinv <- paste0(nm,"1InverseWarp.nii.gz")
+        if (!length(affine))
+            prenumber <- 0
+        else
+            prenumber <- 1
+        transforms$warpfwd <- paste0(nm,prenumber,"Warp.nii.gz")
+        transforms$warpinv <- paste0(nm,prenumber,"InverseWarp.nii.gz")
     }
     if (length(affine))
         transforms$affine <-  paste0(nm,"0GenericAffine.mat")
