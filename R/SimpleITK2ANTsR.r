@@ -13,9 +13,10 @@ sitk2antsImage <- function(image) {
         pitype <- "unsigned int"
     if (grepl("unsigned char",pixeltype))
         pitype <- "unsigned char"
-    arr <- as.array(image)
-    
+    arr <- SimpleITK::as.array(image)
+    dir <- image$GetDirection()
     aImage <- as.antsImage(arr,spacing=image$GetSpacing(),origin=image$GetOrigin(),pixeltype=pitype)
+    antsSetDirection(aImage, matrix(dir,sqrt(length(dir)),sqrt(length(dir)),byrow = TRUE))
     return(aImage)
 }
 
