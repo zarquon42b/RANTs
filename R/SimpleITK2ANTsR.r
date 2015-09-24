@@ -9,10 +9,10 @@ sitk2antsImage <- function(image) {
         stop("please install SimpleITK R-package")
     pixeltype <- image$GetPixelIDTypeAsString()
     pitype <- "float"
-    if (grepl("unsigned integer",pixeltype))
-        pitype <- "unsigned int"
-    if (grepl("unsigned char",pixeltype))
-        pitype <- "unsigned char"
+    #if (grepl("unsigned integer",pixeltype))
+    #    pitype <- "unsigned int"
+    #if (grepl("unsigned char",pixeltype))
+    #    pitype <- "unsigned char"
     arr <- SimpleITK::as.array(image)
     dir <- image$GetDirection()
     aImage <- as.antsImage(arr,spacing=image$GetSpacing(),origin=image$GetOrigin(),pixeltype=pitype)
