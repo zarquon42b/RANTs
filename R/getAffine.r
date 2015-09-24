@@ -29,3 +29,34 @@ getAffineParams <- function(file) {
     out$affine <- t(matrix(aff$AffineTransform.float.3.3[1:9],3,3,byrow = T))
     return(out)
 }
+
+
+mat2comp <- function(affinemat,IJK2RAS=diag(c(-1,-1,1,1))) {
+    hgamm1 <- t(IJK2RAS%*%affinemat%*%IJK2RAS)[1:3,1:3]
+    center1 <- rep(0,3)
+    trans1 <- (IJK2RAS%*%affinemat[1:4,4])[1:3]
+    return(list(mat=hgamm1,center=center1,trans=trans1))
+}
+
+
+mat2file <- function(affinemat,file="test1.txt",IJK2RAS=diag(c(-1,-1,1,1))) {
+    out <- mat2comp(affinemat,IJK2RAS=IJK2RAS)
+    AffineTransform_float_3_3 <- rep(0,12)
+    AffineTransform_float_3_3[10:12] <- out$trans[1:3]
+    AffineTransform_float_3_3[1:9] <- as.vector(out$mat)
+    AffineTransform_float_3_3 <- (AffineTransform_float_3_3)
+    writeMat(file,AffineTransform_float_3_3=AffineTransform_float_3_3,fixed=as.matrix(out$center))
+    cat("#Insight Transform File V1.0 \n",file=file)
+    cat("#Transform 0 \n",file=file,append = T)
+    cat("Transform: AffineTransform_double_3_3\n",file=file,append = T)
+    cat("Parameters: ",file = file,append=T)
+    cat(AffineTransform_float_3_3,file = file,append = T)
+    cat("\nFixed Parameters: ",file = file,append=T)
+    cat(out$center,file = file,append = T,fill=T)
+    #cat("\n ",file = file,append=T)
+    
+        
+    
+
+
+}
