@@ -22,12 +22,13 @@
 #' @param itkthreads integer: specify number of threads to be used
 #' @param folder character defining the path where to store the transforms
 #' @param transimg logical: if TRUE the *diff and *inv will be created.
+#' @param verbose logcal: if TRUE output are written to console
 #' @return returns a list with
 #' \item{antsargs}{arguments passed to antsRegistration}
 #' \item{outname}{basename of outputname}
 #' \item{transforms}{list containing characters naming the transforms}
 #' @export
-createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine=c("trans","rigid","similarity","affine"),affinereach=32,affineconverge="[10000x10000x10000,1e-8,20]",elastic="SyN[0.2,3,0]",elasticpercent=0.1,elasticconverge ="[100x10x1,0,5]",elasticmetrics=c("mattes","cc"),metricweights=NULL, metricreach=c(32,4),dims=3,elasticS="3x1x0vox",elasticF="3x2x1",initTransform=NULL,itkthreads=parallel::detectCores(),masks=NULL,folder=NULL,transimg=TRUE) {
+createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine=c("trans","rigid","similarity","affine"),affinereach=32,affineconverge="[10000x10000x10000,1e-8,20]",elastic="SyN[0.2,3,0]",elasticpercent=0.1,elasticconverge ="[100x10x1,0,5]",elasticmetrics=c("mattes","cc"),metricweights=NULL, metricreach=c(32,4),dims=3,elasticS="3x1x0vox",elasticF="3x2x1",initTransform=NULL,itkthreads=parallel::detectCores(),masks=NULL,folder=NULL,transimg=FALSE,verbose=FALSE) {
     if (nargs() == 0) {
         antsRegistration()
         return()
@@ -78,18 +79,20 @@ createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine
     else
         output <- list(o=paste0("[",nm,"]"))
     antsargs <- append(antsargs,list(u="1",l="1",z="1",float="1"))
+    if (verbose)
+         antsargs <- append(antsargs,list(verbose="1"))
     antsargs <- append(antsargs,output)
 
     transforms <- list()
     if (length(elastic)) {
-        if (!length(affine))
+        if (!length(affine) && is.null(initTransform))
             prenumber <- 0
         else
             prenumber <- 1
         transforms$warpfwd <- paste0(nm,prenumber,"Warp.nii.gz")
         transforms$warpinv <- paste0(nm,prenumber,"InverseWarp.nii.gz")
     }
-    if (length(affine))
+    if (length(affine) ||  !is.null(initTransform))
         transforms$affine <-  paste0(nm,"0GenericAffine.mat")
     return(list(antsargs=antsargs,outname=basename(nm),transforms=transforms))
     

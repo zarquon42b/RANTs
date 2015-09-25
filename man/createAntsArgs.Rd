@@ -12,7 +12,7 @@ createAntsArgs(reference, target, setting = "custom", percent = 0.1,
   metricreach = c(32, 4), dims = 3, elasticS = "3x1x0vox",
   elasticF = "3x2x1", initTransform = NULL,
   itkthreads = parallel::detectCores(), masks = NULL, folder = NULL,
-  transimg = TRUE)
+  transimg = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{reference}{path to moving image}
@@ -49,6 +49,8 @@ images (=0), the image intensities (=1), or the origin of the images (=2).}
 \item{folder}{character defining the path where to store the transforms}
 
 \item{transimg}{logical: if TRUE the *diff and *inv will be created.}
+
+\item{verbose}{logcal: if TRUE output are written to console}
 
 \item{affineconvergence}{character: convergence values for affine transforms MxNxO [MxNxO,<convergenceThreshold=1e-6>,<convergenceWindowSize=10>]}
 
