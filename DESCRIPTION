@@ -15,6 +15,7 @@ Imports:
     R.matlab,	 
     Morpho,
     Rvcg
+LinkingTo: Rcpp, RcppArmadillo
 License: GPL-2
 LazyLoad: yes
 URL: https://github.com/zarquon42b/RANTs
