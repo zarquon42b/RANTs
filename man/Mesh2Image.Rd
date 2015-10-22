@@ -6,7 +6,8 @@
 \usage{
 Mesh2Image(x, spacing = rep(1, 3), margin = 0.05, sign = FALSE, k = 1,
   IJK2RAS = diag(c(-1, -1, 1, 1)), inval = 255, outval = 0,
-  thresh = min(spacing), binary = FALSE)
+  thresh = min(spacing), binary = FALSE, cores = 2, useMP = TRUE,
+  maxind = ifelse(useMP, 1e+06, 1e+05))
 }
 \arguments{
 \item{x}{surface mesh}
@@ -28,6 +29,12 @@ Mesh2Image(x, spacing = rep(1, 3), margin = 0.05, sign = FALSE, k = 1,
 \item{thresh}{maximal distance to consider}
 
 \item{binary}{logical: if TRUE the output will be a binary image}
+
+\item{cores}{integer: amount of cores used in parallel execution (be careful, as the process gets forked and then uses cores times as much RAM).}
+
+\item{useMP}{logical: if TRUE the parallel computation will be during kdtree search, otherwise the mclapply is used.}
+
+\item{maxind}{integer: maximum amount of grid points to evaluate at once (for memory reasons)}
 }
 \value{
 returns a distance image of class antsImage
