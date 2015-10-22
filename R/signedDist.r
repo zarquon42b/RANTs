@@ -66,7 +66,7 @@ Mesh2Image <- function(x,spacing=rep(1,3),margin=0.05,sign=FALSE,k=1,IJK2RAS=dia
     outimage <- as.antsImage(myarr, spacing = spacing, origin = grid$origin)
     return(outimage)
 }
-
+#' @importFrom Rvcg vcgKDtree
 points2LabelImage <- function(points, neighbours=16,spacing=rep(1,3),margin=0.05,IJK2RAS=diag(c(-1,-1,1,1))) {
     pts <- applyTransform(points,IJK2RAS)
     ranges <- apply(pts,2,range)
