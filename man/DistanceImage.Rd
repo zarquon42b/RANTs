@@ -5,7 +5,8 @@
 \title{Create a (signed) distance image from surface mesh}
 \usage{
 DistanceImage(x, spacing = rep(1, 3), margin = 0.05, sign = TRUE, k = 1,
-  IJK2RAS = diag(c(-1, -1, 1, 1)))
+  IJK2RAS = diag(c(-1, -1, 1, 1)), cores = 2, useMP = TRUE,
+  maxind = ifelse(useMP, 1e+06, 1e+05))
 }
 \arguments{
 \item{x}{surface mesh}
@@ -19,6 +20,12 @@ DistanceImage(x, spacing = rep(1, 3), margin = 0.05, sign = TRUE, k = 1,
 \item{k}{k- closest faces to consider during closest point search}
 
 \item{IJK2RAS}{transformation between physical and image space}
+
+\item{cores}{integer: amount of cores used in parallel execution (be careful, as the process gets forked and then uses cores times as much RAM).}
+
+\item{useMP}{logical: if TRUE the parallel computation will be during kdtree search, otherwise the mclapply is used.}
+
+\item{maxind}{integer: maximum amount of grid points to evaluate at once (for memory reasons)}
 }
 \value{
 returns a distance image of class antsImage
