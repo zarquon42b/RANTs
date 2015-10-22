@@ -79,6 +79,26 @@ Mesh2Image <- function(x,spacing=rep(1,3),margin=0.05,sign=FALSE,k=1,IJK2RAS=dia
     return(outimage)
 }
 
+points2LabelImage <- function(points, neighbours=16,spacing=rep(1,3),margin=0.05,IJK2RAS=diag(c(-1,-1,1,1))) {
+    pts <- applyTransform(points,IJK2RAS)
+    ranges <- apply(pts,2,range)
+    ranges <- apply(ranges,2,extendrange,f=margin)
+    grid <- lapply(1:3,function(x) seq(from=ranges[1,x],to=ranges[2,x],by=spacing[x]))
+    mygrid <- as.matrix(expand.grid(grid[[1]],grid[[2]],grid[[3]]))
+    arrdims <- sapply(grid,length)
+    myarr <- array(NA,dim=arrdims)
+    indices <- as.matrix(expand.grid(1L:arrdims[1],1L:arrdims[2],1L:arrdims[3]))
+    nhs <- vcgKDtree(mygrid,pts,k=neighbours)$index
+    dists <- rep(0,nrow(mygrid))
+    for(i in 1:nrow(nhs))
+        dists[nhs[i,]] <- i
+    myarr <- RANTs:::fillArray(indices-1,dists,arrdims)
+    origin <- mygrid[1,]
+    outimage <- as.antsImage(myarr, spacing = spacing, origin = origin)
+    return(outimage)
+}
+    
+    
 fillArray <- function(Ind, yr, dims) {
     out <- .Call("fillArr",Ind, yr,dims)
     return(out)
