@@ -41,8 +41,7 @@ createAntsArgs(reference, target, setting = "custom", percent = 0.1,
 
 \item{elasticF}{shrink factors (see command args of antsRegistration)}
 
-\item{initTransform}{run initial coarse alignment. These features include using the geometric center of the
-images (=0), the image intensities (=1), or the origin of the images (=2).}
+\item{initTransform}{run initial coarse alignment or provide a transform file. These features include using the geometric center of the images (=0), the image intensities (=1), or the origin of the images (=2) or a list containing a character containing the path to the transform and a logical indicating if the transform is to be inverted. E.g list("mytransfrom.mat",TRUE)}
 
 \item{itkthreads}{integer: specify number of threads to be used}
 
