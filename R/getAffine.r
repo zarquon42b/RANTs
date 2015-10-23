@@ -28,14 +28,15 @@ getAffineMat <- function(file,IJK2RAS=diag(c(-1,-1,1,1))) {
 #' @param lmMoving moving landmarks
 #' @param type of transform (can be "rigid","similarity" or "affine")
 #' @param IJK2RAS transform from point to image space.
+#' @param ... additional parameters (such as landmark weights) to be passed to \code{\link{rotonto}}, in case type != affine.
 #' @details
 #' lmMoving are landmarks placed on the image to be transformed to the position of lmFix
 #' @return
 #' writes a transform to a tempfile and returns the path to that transform
 #' @importFrom RcppOctave .CallOctave o_load
-#' @importFrom Morpho rotonto applyTransform computeTransform
+#' @importFrom Morpho rotonto applyTransform computeTransform getTrafo4x4
 #' @export
-landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine"),IJK2RAS=diag(c(-1,-1,1,1)[seq_len(ncol(lmFix)+1)])) {
+landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine"),IJK2RAS=diag(c(-1,-1,1,1)[seq_len(ncol(lmFix)+1)]),...) {
     m <- ncol(lmFix)
     file <- (tempfile(pattern = "transform"))
     file <- paste0(file,".mat")
@@ -44,7 +45,16 @@ landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine
     scale <- FALSE
     type = match.arg(type,c("rigid","affine","similarity"))
     #afftrans <- computeTransform(lmFix,lmMoving,type=type)
-    afftrans0 <- computeTransform(lmMoving,lmFix,type=type)
+    if (type == "affine") {
+        afftrans0 <- computeTransform(lmMoving,lmFix,type=type)
+    } else {
+        scale <- ifelse(type == "rigid",FALSE,TRUE)
+        if (!exists("reflection"))
+            reflection <- FALSE
+        rot <- rotonto(lmMoving,lmFix,scale=scale,reflection=reflection,...)
+        afftrans0 <- getTrafo4x4(rot)
+    }
+    
     ## afftrans <- afftrans0[1:3,]
     ## AffineTransform_double_3_3 <- c(t(afftrans[1:m,1:m]))
     ## AffineTransform_double_3_3 <- c(AffineTransform_double_3_3,afftrans[,m+1])

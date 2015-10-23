@@ -5,7 +5,7 @@
 \title{Create an itk transform from landmarks (rigid, similarity and affine)}
 \usage{
 landmarkTransform(lmFix, lmMoving, type = c("rigid", "similarity", "affine"),
-  IJK2RAS = diag(c(-1, -1, 1, 1)[seq_len(ncol(lmFix) + 1)]))
+  IJK2RAS = diag(c(-1, -1, 1, 1)[seq_len(ncol(lmFix) + 1)]), ...)
 }
 \arguments{
 \item{lmFix}{fix landmarks}
@@ -15,6 +15,8 @@ landmarkTransform(lmFix, lmMoving, type = c("rigid", "similarity", "affine"),
 \item{type}{of transform (can be "rigid","similarity" or "affine")}
 
 \item{IJK2RAS}{transform from point to image space.}
+
+\item{...}{additional parameters (such as landmark weights) to be passed to \code{\link{rotonto}}, in case type != affine.}
 }
 \value{
 writes a transform to a tempfile and returns the path to that transform
