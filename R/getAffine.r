@@ -62,11 +62,20 @@ landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine
     ## fixed <- rep(0,m)
     ## o_load(list(AffineTransform_double_3_3=matrix(AffineTransform_double_3_3,12,1),fixed=as.matrix(fixed)))
     ## .CallOctave("save", "-v4", file, "AffineTransform_double_3_3", "fixed")
-    transform2mat(afftrans0,file)
+    transform2mat(afftrans0,file,diag(rep(1,m+1)))
     return (file)
 }
 
-transform2mat <- function(affinemat,file,IJK2RAS=diag(c(1,1,1,1)[seq_len(nrow(affinemat))])) {
+#' write an affine transform matrix to ITK mat format
+#'
+#' write an affine transform matrix to ITK mat format
+#' @param affinemat a 4x4 (3D case) or 3x3 (2D case) homogenous transform matrix
+#' @param file filename
+#' @param IJK2RAS transform from point to image space.
+#' @return
+#' returns the character of the filename
+#' @export
+transform2mat <- function(affinemat,file,IJK2RAS=diag(c(-1,-1,1,1)[seq_len(nrow(affinemat))])) {
     affinemat <- IJK2RAS%*%affinemat%*%IJK2RAS
     m <- nrow(affinemat)-1
     affinemat <- affinemat[1:m,]
@@ -80,6 +89,7 @@ transform2mat <- function(affinemat,file,IJK2RAS=diag(c(1,1,1,1)[seq_len(nrow(af
         o_load(list(AffineTransform_double_3_3=matrix(AffineTransform_double_3_3,12,1),fixed=as.matrix(fixed)))
         .CallOctave("save", "-v4", file, "AffineTransform_double_3_3", "fixed") 
     }
+    return(file)
 
 }
 
