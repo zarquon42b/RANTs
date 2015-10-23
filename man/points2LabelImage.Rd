@@ -4,21 +4,22 @@
 \alias{points2LabelImage}
 \title{create a label image from landmark coordinates}
 \usage{
-points2LabelImage(points, neighbours = 16, spacing = rep(1, 3),
-  margin = 0.05, IJK2RAS = diag(c(-1, -1, 1, 1)))
+points2LabelImage(pts, neighbours = 16, spacing = rep(1, ncol(pts)),
+  margin = 0.1, labelcolors = seq_len(nrow(pts)), IJK2RAS = diag(c(-1, -1,
+  1, 1)[seq_len(ncol(pts) + 1)]))
 }
 \arguments{
+\item{pts}{k x 2 or k x 3 matrix containing landmark coordinates}
+
 \item{neighbours}{integer: number of closest points in the image grid to label}
 
 \item{spacing}{spacing of the output image}
 
 \item{margin}{margin around the landmarks (determined by the extend of the bounding box) to be part of the image}
 
-\item{IJK2RAS}{transform from point to image space.}
-
-\item{pts}{k x 2 or k x 3 matrix containing landmark coordinates}
-
 \item{labelcolors}{vector of length nrow(pts) with a color for each landmark label}
+
+\item{IJK2RAS}{transform from point to image space.}
 }
 \value{
 returns an antsImage
