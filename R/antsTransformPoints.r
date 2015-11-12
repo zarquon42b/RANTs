@@ -25,7 +25,6 @@ antsTransformPoints.matrix <- function(mat,transformlist, whichtoinvert=NA,IJK2R
     } else
         stop("only 2D and 3D points allowed")
     #readit <- as.matrix(antsApplyTransformsToPoints(ptsdim,pts,transformlist,whichtoinvert))
-    print(dim(pts))
     readit <- applyTransform(as.matrix(antsApplyTransformsToPoints(ptsdim,pts,transformlist,whichtoinvert)),trafo=IJK2RAS,inverse=T)
     #readit <- applyTransform(as.matrix(read.csv(output)[,1:3]),trafo=IJK2RAS,inverse=T)##convert back to RAS space
     readit <- readit[,1:ptsdim]
