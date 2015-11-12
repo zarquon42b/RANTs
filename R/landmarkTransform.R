@@ -20,7 +20,7 @@ landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine
     lmFix <- applyTransform(lmFix,IJK2RAS)
     lmMoving <- applyTransform(lmMoving,IJK2RAS)
     scale <- FALSE
-    type = match.arg(type,c("rigid","affine","similarity"))
+    type = match.arg(type[1],c("rigid","affine","similarity"))
     #afftrans <- computeTransform(lmFix,lmMoving,type=type)
     if (type == "affine") {
         afftrans0 <- computeTransform(lmMoving,lmFix,type=type)
