@@ -22,12 +22,15 @@
 #' @param folder character defining the path where to store the transforms
 #' @param transimg logical: if TRUE the *diff and *inv will be created.
 #' @param verbose logcal: if TRUE output are written to console
+#' @param referenceLM k x 3 matrix for landmarks to be used in metrics PSE and JHCT
+#' @param targetLM k x 3 matrix for landmarks to be used in metrics PSE and JHCT
+#' @param IJK2RAS 4x4 matrix defining the transform of the landmarks into image space.
 #' @return returns a list with
 #' \item{antsargs}{arguments passed to antsRegistration}
 #' \item{outname}{basename of outputname}
 #' \item{transforms}{list containing characters naming the transforms}
 #' @export
-createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine=c("trans","rigid","similarity","affine"),affinereach=32,affineconverge="[10000x10000x10000,1e-8,20]",elastic="SyN[0.2,3,0]",elasticpercent=0.1,elasticconverge ="[100x10x1,0,5]",elasticmetrics=c("mattes","cc"),metricweights=NULL, metricreach=c(32,4),dims=3,elasticS="3x1x0vox",elasticF="3x2x1",initTransform=NULL,itkthreads=parallel::detectCores(),masks=NULL,folder=NULL,transimg=FALSE,verbose=FALSE) {
+createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine=c("trans","rigid","similarity","affine"),affinereach=32,affineconverge="[10000x10000x10000,1e-8,20]",elastic="SyN[0.2,3,0]",elasticpercent=0.1,elasticconverge ="[100x10x1,0,5]",elasticmetrics=c("mattes","cc"),metricweights=NULL, metricreach=c(32,4),dims=3,elasticS="3x1x0vox",elasticF="3x2x1",initTransform=NULL,itkthreads=parallel::detectCores(),masks=NULL,folder=NULL,transimg=FALSE,verbose=FALSE,referenceLM=NULL,targetLM=NULL,IJK2RAS=diag(c(-1,-1,1,1))) {
     if (nargs() == 0) {
         antsRegistration()
         return()
@@ -35,6 +38,19 @@ createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine
     if (!is.null(folder))
         folder <- paste0(folder,"/")
     Sys.setenv(ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=itkthreads)
+
+    hasLM <- FALSE
+    if (!is.null(referenceLM) && !is.null(targetLM)){
+        hasLM <- TRUE
+        refimage <- antsImageRead(target)
+        print(dim(referenceLM))
+        randstring <- paste(sample(c(0:9, letters, LETTERS), 5, replace=TRUE),collapse="")
+        tlmimage <- paste0(tempdir(),"/",randstring,"_targetLM.nii.gz")
+        rlmimage <- paste0(tempdir(),"/",randstring,"_referenceLM.nii.gz")
+        antsImageWrite(points2LabelImage(targetLM,RAS2IJK=IJK2RAS,refimage = refimage,neighbours = 100,spacing=antsGetSpacing(refimage)),tlmimage)
+        antsImageWrite(points2LabelImage(referenceLM,RAS2IJK=IJK2RAS,refimage=refimage,neighbours = 100,spacing=antsGetSpacing(refimage)),rlmimage)
+    }
+    
     nm <- paste0(folder,basename(target),"_fixed_",basename(reference),"_moving_",setting[1])
     if (is.null(metricweights))
         metricweights <- rep(1,length(elasticmetrics))
@@ -63,11 +79,18 @@ createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine
         antsargs <- append(antsargs,curargs)
                           
     }
+    ## setup arguments for elastic matching
     if (length(elastic)) {
         elasticargs <- list()
         for( i in 1 : length(mweights)) {
+           
             if (mweights[i] != 0) {
-                elasticargs <- append(elasticargs,list(m=paste0(metrics[i],"[",target,",",reference,",",mweights[i],",", metricreach[i],",regular,",elasticpercent,"]")))
+                if (!metrics[i] %in% c("PSE")) {
+                    elasticargs <- append(elasticargs,list(m=paste0(metrics[i],"[",target,",",reference,",",mweights[i],",", metricreach[i],",regular,",elasticpercent,"]")))
+               } else {
+                    if (hasLM)
+                        elasticargs <- append(elasticargs,list(m=paste0(metrics[i],"[",tlmimage,",",rlmimage,",",mweights[i],",",elasticpercent,",0,1,",metricreach[i],"]")))
+                }
             }
         }
         elasticsuffix <- list(c=elasticconverge,s=elasticS,f=elasticF)
