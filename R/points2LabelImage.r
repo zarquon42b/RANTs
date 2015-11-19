@@ -44,11 +44,11 @@ points2LabelImage <- function(pts, neighbours=16,spacing=rep(1,ncol(pts)),margin
         file <- paste0(tempfile(pattern = "transform"),".mat")
         trafo <- transform2mat(diag(m+1),file)
         outimage <- antsApplyTransforms(refimage,outimage,trafo,whichtoinvert = FALSE)
-        outarr <- as.array(outimage)
+        outarr <- ANTsR::as.array(outimage)
         ## ## discretize values
         storage.mode(outarr) <- "integer"
         outarr <- as.antsImage(outarr)
-        antsCopyImageInfo(outarr,outimage)
+        antsCopyImageInfo(outimage,outarr)
         outimage <- outarr
     }
         
