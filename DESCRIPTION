@@ -12,12 +12,12 @@ Depends:
     R (>= 3.0.2),
     ANTsR
 Imports:
-    R.matlab,	 
+    R.matlab,
     Morpho,
     Rvcg,
-    parallel,
-    RcppOctave
+    parallel
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL-2
 LazyLoad: yes
 URL: https://github.com/zarquon42b/RANTs
+RoxygenNote: 5.0.1

@@ -10,7 +10,6 @@
 #' lmMoving are landmarks placed on the image to be transformed to the position of lmFix
 #' @return
 #' writes a transform to a tempfile and returns the path to that transform
-#' @importFrom RcppOctave .CallOctave o_load
 #' @importFrom Morpho rotonto applyTransform computeTransform getTrafo4x4
 #' @export
 landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine"),IJK2RAS=diag(c(-1,-1,1,1)[seq_len(ncol(lmFix)+1)]),...) {
@@ -45,19 +44,35 @@ landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine
 #' returns the character of the filename
 #' @export
 transform2mat <- function(affinemat,file,IJK2RAS=diag(c(-1,-1,1,1)[seq_len(nrow(affinemat))])) {
+   transout <- transform2antsTrafo(affinemat=affinemat,IJK2RAS = IJK2RAS)
+   writeAntsrTransform(transout,filename=file)
+}
+
+#' convert an affine transform from matrix to antsrTransform
+#'
+#' convert an affine transform from matrix to antsrTransform (implementation of itk::Transform
+#' 
+#' @param affinemat a 4x4 (3D case) or 3x3 (2D case) homogenous transform matrix
+#' @param file filename
+#' @param IJK2RAS transform from point to image space.
+#' @return
+#' returns object of class antsrTransform
+#' @export
+transform2antsTrafo <- function(affinemat,IJK2RAS=diag(c(-1,-1,1,1)[seq_len(nrow(affinemat))])) {
     affinemat <- IJK2RAS%*%affinemat%*%IJK2RAS
     m <- nrow(affinemat)-1
     affinemat <- affinemat[1:m,]
     AffineTransform_double_3_3 <- c(t(affinemat[1:m,1:m]))
     AffineTransform_double_3_3 <- c(AffineTransform_double_3_3,affinemat[,m+1])
     fixed <- rep(0,m)
+    trafo <- createAntsrTransform(dimension=m)
     if (m == 2) {
-       o_load(list(AffineTransform_double_2_2=matrix(AffineTransform_double_3_3,6,1),fixed=as.matrix(fixed)))
-       .CallOctave("save", "-v4", file, "AffineTransform_double_2_2", "fixed") 
+        setAntsrTransformParameters(trafo,matrix(AffineTransform_double_3_3,6,1)) 
+       
     } else {
-        o_load(list(AffineTransform_double_3_3=matrix(AffineTransform_double_3_3,12,1),fixed=as.matrix(fixed)))
-        .CallOctave("save", "-v4", file, "AffineTransform_double_3_3", "fixed") 
+        setAntsrTransformParameters(trafo,matrix(AffineTransform_double_3_3,12,1)) 
     }
-    return(file)
+    return(trafo)
 
 }
+
