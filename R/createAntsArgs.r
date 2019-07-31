@@ -17,7 +17,7 @@
 #' @param dims dimensionality of data
 #' @param elasticS smoothing sigmas (see command args of antsRegistration)
 #' @param elasticF shrink factors (see command args of antsRegistration)
-#' @param initTransform run initial coarse alignment or provide a transform file. These features include using the geometric center of the images (=0), the image intensities (=1), or the origin of the images (=2) or a list containing a character containing the path to the transform and a logical indicating if the transform is to be inverted. E.g list("mytransfrom.mat",TRUE)
+#' @param initTransform run initial coarse alignment or provide a transform file. These features include using the geometric center of the images (=0), the image intensities (=1), or the origin of the images (=2) or a list containing lists with two entries containing the path to the transform and a logical indicating if the transform is to be inverted. E.g \code{initTransform=list(list("mytransfrom.mat",TRUE))}
 #' @param itkthreads integer: specify number of threads to be used
 #' @param folder character defining the path where to store the transforms
 #' @param transimg logical: if TRUE the *diff and *inv will be created.
@@ -50,8 +50,10 @@ createAntsArgs <- function(reference,target,setting="custom",percent=0.1, affine
         if (is.numeric(initTransform))
             antsargs <- append(antsargs,list(r=paste0("[",target,",",reference,",",initTransform,"]")))
         else if (is.list(initTransform)) {
-            tmparg <- paste0("[",initTransform[[1]],", ",as.integer(initTransform[[2]]),"]")
-            antsargs <- append(antsargs,list(r=tmparg))
+            for (i in length(initTransform)) {
+                tmparg <- paste0("[",initTransform[[i]][[1]],", ",as.integer(initTransform[[i]][[2]]),"]")
+                antsargs <- append(antsargs,list(r=tmparg))
+            }
         }
     }
     affineprefix <- list(m=paste0("mattes[",target,",",reference,",1,",affinereach,",regular,",percent,"]"))

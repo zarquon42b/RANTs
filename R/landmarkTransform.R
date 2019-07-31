@@ -5,6 +5,7 @@
 #' @param lmMoving moving landmarks
 #' @param type of transform (can be "rigid","similarity" or "affine")
 #' @param IJK2RAS transform from point to image space.
+#' @param file filename to save the transform to.
 #' @param ... additional parameters (such as landmark weights) to be passed to \code{\link{rotonto}}, in case type != affine.
 #' @details
 #' lmMoving are landmarks placed on the image to be transformed to the position of lmFix
@@ -12,10 +13,12 @@
 #' writes a transform to a tempfile and returns the path to that transform
 #' @importFrom Morpho rotonto applyTransform computeTransform getTrafo4x4
 #' @export
-landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine"),IJK2RAS=diag(c(-1,-1,1,1)[seq_len(ncol(lmFix)+1)]),...) {
+landmarkTransform <- function(lmFix,lmMoving,type=c("rigid","similarity","affine"),IJK2RAS=diag(c(-1,-1,1,1)[seq_len(ncol(lmFix)+1)]),file=NULL,...) {
     m <- ncol(lmFix)
-    file <- (tempfile(pattern = "transform"))
-    file <- paste0(file,".mat")
+    if (is.null(file)) {
+        file <- (tempfile(pattern = "transform"))
+        file <- paste0(file,".mat")
+    }
     lmFix <- applyTransform(lmFix,IJK2RAS)
     lmMoving <- applyTransform(lmMoving,IJK2RAS)
     scale <- FALSE
@@ -63,9 +66,9 @@ transform2antsTrafo <- function(affinemat,IJK2RAS=diag(c(-1,-1,1,1)[seq_len(nrow
     m <- nrow(affinemat)-1
     affinemat <- affinemat[1:m,]
     AffineTransform_double_3_3 <- c(t(affinemat[1:m,1:m]))
-    AffineTransform_double_3_3 <- c(AffineTransform_double_3_3,affinemat[,m+1])
+    AffineTransform_double_3_3 <- c(AffineTransform_double_3_3,affinemat[1:m,m+1])
     fixed <- rep(0,m)
-    trafo <- createAntsrTransform(dimension=m)
+    trafo <- createAntsrTransform(dimension=m,precision="double")
     if (m == 2) {
         setAntsrTransformParameters(trafo,matrix(AffineTransform_double_3_3,6,1)) 
        

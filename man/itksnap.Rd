@@ -14,4 +14,3 @@ itksnap(image, overlay = NA)
 \description{
 call itksnap to view an antsImage
 }
-

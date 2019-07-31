@@ -6,13 +6,14 @@
 \alias{antsTransformPoints.mesh3d}
 \title{a handy wrapper for antsApplyTransformsToPoints}
 \usage{
-antsTransformPoints(mat, transformlist, IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
+antsTransformPoints(mat, transformlist, IJK2RAS = diag(c(-1, -1, 1, 1)),
+  ...)
 
-\method{antsTransformPoints}{matrix}(mat, transformlist, whichtoinvert = NA,
-  IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
+\method{antsTransformPoints}{matrix}(mat, transformlist,
+  whichtoinvert = NA, IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
 
-\method{antsTransformPoints}{mesh3d}(mat, transformlist, whichtoinvert = NA,
-  IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
+\method{antsTransformPoints}{mesh3d}(mat, transformlist,
+  whichtoinvert = NA, IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
 }
 \arguments{
 \item{mat}{a matrix or mesh3d}
@@ -28,4 +29,3 @@ antsTransformPoints(mat, transformlist, IJK2RAS = diag(c(-1, -1, 1, 1)), ...)
 \description{
 a handy wrapper for antsApplyTransformsToPoints
 }
-

@@ -15,4 +15,3 @@ returns a antsImage
 \description{
 convert an  SimpleITK image to an antsImage
 }
-

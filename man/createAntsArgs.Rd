@@ -5,12 +5,12 @@
 \title{interface to generate arguments for antsRegistration command}
 \usage{
 createAntsArgs(reference, target, setting = "custom", percent = 0.1,
-  affine = c("trans", "rigid", "similarity", "affine"), affinereach = 32,
-  affineconverge = "[10000x10000x10000,1e-8,20]", elastic = "SyN[0.2,3,0]",
-  elasticpercent = 0.1, elasticconverge = "[100x10x1,0,5]",
-  elasticmetrics = c("mattes", "cc"), metricweights = NULL,
-  metricreach = c(32, 4), dims = 3, elasticS = "3x1x0vox",
-  elasticF = "3x2x1", initTransform = NULL,
+  affine = c("trans", "rigid", "similarity", "affine"),
+  affinereach = 32, affineconverge = "[10000x10000x10000,1e-8,20]",
+  elastic = "SyN[0.2,3,0]", elasticpercent = 0.1,
+  elasticconverge = "[100x10x1,0,5]", elasticmetrics = c("mattes",
+  "cc"), metricweights = NULL, metricreach = c(32, 4), dims = 3,
+  elasticS = "3x1x0vox", elasticF = "3x2x1", initTransform = NULL,
   itkthreads = parallel::detectCores(), masks = NULL, folder = NULL,
   transimg = FALSE, verbose = FALSE)
 }
@@ -41,7 +41,7 @@ createAntsArgs(reference, target, setting = "custom", percent = 0.1,
 
 \item{elasticF}{shrink factors (see command args of antsRegistration)}
 
-\item{initTransform}{run initial coarse alignment or provide a transform file. These features include using the geometric center of the images (=0), the image intensities (=1), or the origin of the images (=2) or a list containing a character containing the path to the transform and a logical indicating if the transform is to be inverted. E.g list("mytransfrom.mat",TRUE)}
+\item{initTransform}{run initial coarse alignment or provide a transform file. These features include using the geometric center of the images (=0), the image intensities (=1), or the origin of the images (=2) or a list containing lists with two entries containing the path to the transform and a logical indicating if the transform is to be inverted. E.g \code{initTransform=list(list("mytransfrom.mat",TRUE))}}
 
 \item{itkthreads}{integer: specify number of threads to be used}
 
@@ -64,4 +64,3 @@ returns a list with
 \description{
 interface to generate arguments for antsRegistration command
 }
-

@@ -4,8 +4,8 @@
 \alias{DistanceImage}
 \title{Create a (signed) distance image from surface mesh}
 \usage{
-DistanceImage(x, spacing = rep(1, 3), margin = 0.05, sign = TRUE, k = 1,
-  IJK2RAS = diag(c(-1, -1, 1, 1)), cores = 2, useMP = TRUE,
+DistanceImage(x, spacing = rep(1, 3), margin = 0.05, sign = TRUE,
+  k = 1, IJK2RAS = diag(c(-1, -1, 1, 1)), cores = 2, useMP = TRUE,
   maxind = ifelse(useMP, 1e+06, 1e+05))
 }
 \arguments{
@@ -33,4 +33,3 @@ returns a distance image of class antsImage
 \description{
 Create a (signed) distance image from surface mesh
 }
-

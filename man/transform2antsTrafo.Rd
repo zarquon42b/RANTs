@@ -20,4 +20,3 @@ returns object of class antsrTransform
 \description{
 convert an affine transform from matrix to antsrTransform (implementation of itk::Transform
 }
-

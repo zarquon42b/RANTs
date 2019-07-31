@@ -4,8 +4,8 @@
 \alias{Mesh2Image}
 \title{Create a (optionally) binary image from surface mesh}
 \usage{
-Mesh2Image(x, spacing = rep(1, 3), margin = 0.05, sign = FALSE, k = 1,
-  IJK2RAS = diag(c(-1, -1, 1, 1)), inval = 255, outval = 0,
+Mesh2Image(x, spacing = rep(1, 3), margin = 0.05, sign = FALSE,
+  k = 1, IJK2RAS = diag(c(-1, -1, 1, 1)), inval = 255, outval = 0,
   thresh = min(spacing), binary = FALSE, cores = 2, useMP = TRUE,
   maxind = ifelse(useMP, 1e+06, 1e+05))
 }
@@ -42,4 +42,3 @@ returns a distance image of class antsImage
 \description{
 Create a (optionally) binary image from surface mesh
 }
-

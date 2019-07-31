@@ -2,15 +2,16 @@
 % Please edit documentation in R/isosurface.r
 \name{isosurface}
 \alias{isosurface}
-\alias{isosurface._p_itk__simple__Image}
 \alias{isosurface.antsImage}
+\alias{isosurface._p_itk__simple__Image}
 \title{Create isosurface from 3D images}
 \usage{
 isosurface(x, threshold, as.int = TRUE, ...)
 
 \method{isosurface}{antsImage}(x, threshold, as.int = TRUE, ...)
 
-\method{isosurface}{_p_itk__simple__Image}(x, threshold, as.int = TRUE, ...)
+\method{isosurface}{_p_itk__simple__Image}(x, threshold, as.int = TRUE,
+  ...)
 }
 \arguments{
 \item{x}{image of class antsImage or SimpleITK (_p_itk__simple__Image).}
@@ -27,4 +28,3 @@ returns a triangulated mesh of class mesh3d.
 \description{
 Create isosurface from 3D images
 }
-

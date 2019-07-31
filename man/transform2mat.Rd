@@ -20,4 +20,3 @@ returns the character of the filename
 \description{
 write an affine transform matrix to ITK mat format
 }
-

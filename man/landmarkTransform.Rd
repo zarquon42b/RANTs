@@ -4,8 +4,9 @@
 \alias{landmarkTransform}
 \title{Create an itk transform from landmarks (rigid, similarity and affine)}
 \usage{
-landmarkTransform(lmFix, lmMoving, type = c("rigid", "similarity", "affine"),
-  IJK2RAS = diag(c(-1, -1, 1, 1)[seq_len(ncol(lmFix) + 1)]), ...)
+landmarkTransform(lmFix, lmMoving, type = c("rigid", "similarity",
+  "affine"), IJK2RAS = diag(c(-1, -1, 1, 1)[seq_len(ncol(lmFix) + 1)]),
+  file = NULL, ...)
 }
 \arguments{
 \item{lmFix}{fix landmarks}
@@ -15,6 +16,8 @@ landmarkTransform(lmFix, lmMoving, type = c("rigid", "similarity", "affine"),
 \item{type}{of transform (can be "rigid","similarity" or "affine")}
 
 \item{IJK2RAS}{transform from point to image space.}
+
+\item{file}{filename to save the transform to.}
 
 \item{...}{additional parameters (such as landmark weights) to be passed to \code{\link{rotonto}}, in case type != affine.}
 }
@@ -27,4 +30,3 @@ Create an itk transform from landmarks (rigid, similarity and affine) to transfo
 \details{
 lmMoving are landmarks placed on the image to be transformed to the position of lmFix
 }
-

@@ -39,4 +39,3 @@ plot(fi,list(li),alpha=0.3,add=T)
 \author{
 Schlager S
 }
-

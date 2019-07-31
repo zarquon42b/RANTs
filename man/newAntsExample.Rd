@@ -19,4 +19,3 @@ newAntsExample(reference, target, setting = c("fast", "production"),
 \description{
 This is simply the script newAntsExample.sh as an R function
 }
-
